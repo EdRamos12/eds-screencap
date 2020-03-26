@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Ed's simple screen recorder thingy</title>
+    <link rel="stylesheet" href="../mainStyle.css" />
+    <script defer src="renderer.js" type="module"></script>
+  </head>
+  <body>
+    <div class="app">
+      <h1>Ed's simple recorder</h1>
+      <h4>
+        To start recording things, just press the green button! You can change
+        which window you want at the bottom of the window.
+      </h4>
+
+      <h4>Preview video:</h4>
+      <div class="videoconfig">
+        <video width="100%" muted></video>
+        <div class="ck-button" id="micro-audio-btn">
+          <label> 
+            <!--<input type="checkbox" id="micro-audio" value="false">
+            <i class="ti-microphone" title="Include Microphone Audio"></i>-->
+          </label>
+          <span></span>
+        </div>
+        <button id="videoSelectBtn">Choose a video source</button>
+      </div>
+
+      <div class="buttons">
+        <div class="vid-manipulators">
+          <button id="pause"><img src="img/pause.png" alt="Puase" width="10%"></button>
+          <button id="resume"><img src="img/resume.png" alt="Resume" width="10%"></button>
+        </div>
+        <div class="main">
+          <button id="startBtn">Start recording!</button>
+          <button id="stopBtn">Stop</button>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

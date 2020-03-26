@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../mainStyle.css" />
+    <script src="renderer.js" type="module"></script>
+    <title>Config</title>
+</head>
+<body style="padding: 0; margin: 0; width: 100vw">
+    <header>
+        <div class="option" id="close"><!--<img src="img/close.png" alt="X" height="30px">--><svg style="margin: auto;" aria-hidden="false" width="12" height="12" viewBox="0 0 12 12"><polygon fill="black" fill-rule="evenodd" points="11 1.576 6.583 6 11 10.424 10.424 11 6 6.583 1.576 11 1 10.424 5.417 6 1 1.576 1.576 1 6 5.417 10.424 1"></polygon></svg></div>
+    </header>
+    <h1 style="text-align: center;">Preferences</h1>
+    <div class="config" style="padding: .5rem;">
+        <div class="themecfg">
+            <label for="theme">Theme:</label>
+            <select id="theme" name="theme">
+                <option value="light">Light</option>
+                <option value="dark">Dark</option>
+            </select>
+        </div>
+        <div class="videooutput">
+            <div class="vidoutputcfg">
+                <h3>Video Settings</h3>
+                <label for="format">Output video format:</label>
+                <select id="format" name="format">
+                    <option value="mp4">MP4</option>
+                    <option value="gif">GIF</option>
+                    <option value="webp">WEBP</option>
+                    <option value="avi">AVI</option>
+                </select>
+                <button id="dir">Choose directory</button>
+                <input type="text" id="outputdir" name="outputdir" readonly/>
+                <button id="disableDir">Disable default directory</button>
+            </div>
+            <div class="codecscfg">
+                <h5>Video processing config:</h5>
+                <label for="codecs">Set output codec:</label>
+                <select id="codecs" name="codecs">
+                    <option value="libx264">libx264 (h264)</option>
+                    <option value="libvpx-vp9">libvpx-vp9 (vp9)</option>
+                    <option value="libvpx">libvpx (vp8)</option>
+                </select><br>
+                <label for="stream-codecs">Set <b>stream</b> codec:</label>
+                <select id="stream-codecs" name="stream-codecs">
+                    <option value="h264">h264</option>
+                    <option value="vp9">vp9</option>
+                    <option value="vp8">vp8</option>
+                </select>
+            </div>
+        </div>
+        <div class="advanced">
+            <h3>"Advanced options"</h3>
+            <input type="checkbox" id="log"> Make a debug log (requires restart)
+        </div>
+        <button id="save">Save settings</button>
+    </div>
+</body>
+</html>
