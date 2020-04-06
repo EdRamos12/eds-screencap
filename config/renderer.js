@@ -1,4 +1,4 @@
-const { remote, ipcRenderer } = require('electron');
+const { remote, ipcRenderer, shell } = require('electron');
 const { dialog } = remote;
 require('../util/setTheme');
 
@@ -12,6 +12,7 @@ const outputFormatE = document.querySelector('#format');
 const outputCodecE = document.querySelector('#codecs');
 const streamCodecE = document.querySelector('#stream-codecs');
 const dirOutput = document.querySelector('#outputdir');
+const openBtn = document.querySelector('#open-dir');
 const logBtn = document.querySelector('#log');
 let root = document.documentElement;
 
@@ -59,4 +60,8 @@ dirBtn.addEventListener("click", function (e) {
 
 clearDirBtn.addEventListener('click', function (e) {
     dirOutput.value = '';
+});
+
+openBtn.addEventListener('click', function (e) {
+    shell.openItem(dirOutput.value);
 });

@@ -88,8 +88,8 @@ typings/
 # Electron-Forge
 out/
 
-# Ignore temp file
+# Temp file
 temp/
 
-# Ignore config file
+# Config file
 config.json
