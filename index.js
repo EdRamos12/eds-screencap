@@ -63,7 +63,7 @@ const createMainWindow = () => {
     app.quit();
   });
 
-  mainWindow.webContents.openDevTools();
+  //mainWindow.webContents.openDevTools();
 };
 
 // Preferences window
