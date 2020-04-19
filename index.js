@@ -32,6 +32,10 @@ let defaultSettings = {
   outputCodec: 'libx264',
   streamCodec: 'h264',
   defaultPath: '',
+  recordShort: '',
+  stopShort: '',
+  pauseShort: '',
+  resumeShort: ''
 }
 
 let converterStatus; // String that will be passed to the converter

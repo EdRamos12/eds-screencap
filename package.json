@@ -47,7 +47,6 @@
     "electron-json-storage": "^4.1.8",
     "electron-log": "^4.1.0",
     "electron-squirrel-startup": "^1.0.0",
-    "ffprobe-static": "^3.0.0",
     "fluent-ffmpeg": "^2.1.2"
   },
   "devDependencies": {

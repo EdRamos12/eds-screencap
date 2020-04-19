@@ -7,7 +7,6 @@ const { dialog } = remote;
 const ffmpeg = require('fluent-ffmpeg');
 const ffmpegInstaller = require('@ffmpeg-installer/ffmpeg');
 const ffprobe = require('ffprobe-static');
-ffmpeg.setFfprobePath(ffprobe.path); // Sets path for ffprobe
 ffmpeg.setFfmpegPath(ffmpegInstaller.path); // Sets path for ffmpeg
 ffmpeg.getAvailableEncoders((err, encoders) => { // Get encoders
 	console.log('getAvailableEncoders', encoders);
@@ -52,7 +51,6 @@ document.addEventListener('DOMContentLoaded', function (e) {
 		const filePath = converterStuff.path;
 		const totalDuration = converterStuff.duration;
 		new Promise((resolve, reject) => {
-			ffmpeg.ffprobe(vidTemp, function (err, metadata) { console.dir(metadata); }); // Gets webm info
 			// Starts converting things
 			ffmpeg(vidTemp).withVideoCodec(codec).toFormat(format)
 				.on('error', (err) => {
