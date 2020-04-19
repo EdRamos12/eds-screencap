@@ -160,8 +160,8 @@ app.on('ready', function () {
     // Shortcuts
     record = currentData.recordShort;
     stopR = currentData.stopShort;
-    pause = data.pauseShort;
-    resume = data.resumeShort;
+    pause = currentData.pauseShort;
+    resume = currentData.resumeShort;
 
     // Register shortcut listeners
 
