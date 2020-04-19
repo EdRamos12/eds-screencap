@@ -93,3 +93,6 @@ temp/
 
 # Config file
 config.json
+
+# Encoders json
+encoders.json

@@ -1,14 +1,16 @@
+// imports
 const electron = require('electron');
-const log = require('electron-log');
 const app = electron.app;
 const ipc = electron.ipcMain;
+const globalShortcut = electron.globalShortcut;
 const BrowserWindow = electron.BrowserWindow;
 const Bluebird = require('bluebird');
-const storage = Bluebird.promisifyAll(require('electron-json-storage'));
-storage.setDataPath(process.cwd());
-
 const path = require('path');
 const Menu = electron.Menu;
+
+// Sets up storage path
+const storage = Bluebird.promisifyAll(require('electron-json-storage'));
+storage.setDataPath(process.cwd());
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (require('electron-squirrel-startup')) { // eslint-disable-line global-require
@@ -18,16 +20,31 @@ if (require('electron-squirrel-startup')) { // eslint-disable-line global-requir
 process.env['ELECTRON_DISABLE_SECURITY_WARNINGS'] = 'true';
 app.allowRendererProcessReuse = true;
 
+// Sets up global vars
+// Windows
 let mainWindow;
 let configWindow;
 let converterWindow;
 
-let currentPath;
-let currentData;
+let defaultSettings = {
+  theme: 'light',
+  outputFormat: 'mp4',
+  outputCodec: 'libx264',
+  streamCodec: 'h264',
+  defaultPath: '',
+}
 
-const createWindow = () => {
+let converterStatus; // String that will be passed to the converter
+let currentData; // Object which contains users preferences
+
+let record;
+let stopR;
+let pause;
+let resume;
+
+// Main window
+const createMainWindow = () => {
   // Create the browser window.
-  log.info('function createWindow() called');
   mainWindow = new BrowserWindow({
     width: 800,
     height: 600,
@@ -35,34 +52,36 @@ const createWindow = () => {
       nodeIntegration: true,
     }
   });
-  log.info('Window object created');
-  // and load the index.html of the app.
-  log.info('Loading file.');
+  // Load the index.html of the app.
   mainWindow.loadFile(path.join(__dirname, 'recorder/index.html'));
-  // open dev tools
-  log.info('html loaded, Opening tools');
-  mainWindow.webContents.openDevTools();
-  log.info('adding listener');
+
   mainWindow.on('closed', function () {
     app.quit();
   });
-  log.info('createWindow() finished');
+
+  mainWindow.webContents.openDevTools();
 };
 
+// Preferences window
 function createConfigWindow() {
+  // Create the browser window.
   configWindow = new BrowserWindow({
     width: 400,
-    height: 620,
+    height: 650,
     parent: mainWindow,
-    frame: false,
     webPreferences: {
       nodeIntegration: true,
     }
   });
+  // Load the cfg.html of the window.
   configWindow.loadFile(path.join(__dirname, 'config/cfg.html'));
+  // On close, window will be set to null
   configWindow.on('close', function () { configWindow = null });
+  // Removes menu from window
+  configWindow.setMenuBarVisibility(false);
 }
 
+// Convert video window
 function convertOutputWindow() {
   converterWindow = new BrowserWindow({
     width: 700,
@@ -73,7 +92,9 @@ function convertOutputWindow() {
       nodeIntegration: true,
     }
   });
+  // Load the convert.html of the window.
   converterWindow.loadFile(path.join(__dirname, 'videoConverter/convert.html'));
+  // On close, window will be set to null
   converterWindow.on('close', function () { converterWindow = null });
 }
 
@@ -81,6 +102,7 @@ function convertOutputWindow() {
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
 app.on('ready', function () {
+  // Menu template for project
   const template = [
     {
       label: 'File',
@@ -102,9 +124,11 @@ app.on('ready', function () {
       ],
     }
   ];
+  // Minor bug fix for macOS on menu
   if (process.platform == 'darwin') {
     template.unshift({});
   }
+  // If app is in development, option for dev tools will appear on menu
   if (process.env.NODE_ENV !== 'production') {
     template.push({
       label: 'Developer Tools',
@@ -113,22 +137,15 @@ app.on('ready', function () {
       }]
     });
   }
+  // Builds up menu from the template
   const menu = Menu.buildFromTemplate(template);
   Menu.setApplicationMenu(menu);
 
-  //make/get preferences
+  // Make/get preferences
   storage.getAsync('config', function (error, data) {
-    console.log('storage.get called');
     if (error) throw error;
-    if (JSON.stringify(data) == '{}') { // if json is empty or there is no json, makes default settings.
-      let defaultSettings = {
-        theme: 'light',
-        outputFormat: 'mp4',
-        outputCodec: 'libx264',
-        streamCodec: 'h264',
-        defaultPath: '',
-        allowDebugLog: false,
-      }
+    // If there is no json or person has an empty json, it creates a new one
+    if (JSON.stringify(data) == '{}') {
       storage.set('config', defaultSettings, function (error) {
         if (error) throw error;
       });
@@ -136,32 +153,132 @@ app.on('ready', function () {
     } else {
       currentData = data;
     }
+    // Shortcuts
+    record = currentData.recordShort;
+    stopR = currentData.stopShort;
+    pause = data.pauseShort;
+    resume = data.resumeShort;
+
+    // Register shortcut listeners
+
+    // Start and Stop recording
+    if (record == stopR && record !== '' && stopR !== '') {
+      globalShortcut.register(record, () => {
+        mainWindow.webContents.send('start-stop-shortcut');
+        console.log('record fired');
+      });
+    } else {
+      if (record !== '') globalShortcut.register(record, () => {
+        mainWindow.webContents.send('start-recording');
+      });
+      if (stopR !== '') globalShortcut.register(stopR, () => {
+        mainWindow.webContents.send('stop-recording');
+      });
+    }
+    // Pause and Resume recording
+    if (pause == resume && pause !== '' && resume !== '') {
+      globalShortcut.register(pause, () => {
+        mainWindow.webContents.send('pause-resume-shortcut');
+      });
+    } else {
+      if (pause !== '') {
+        globalShortcut.register(pause, () => {
+          mainWindow.webContents.send('pause-recording');
+        });
+      }
+      if (resume !== '') {
+        globalShortcut.register(resume, () => {
+          mainWindow.webContents.send('resume-recording');
+        });
+      }
+    }
   });
-  createWindow();
+
+  // Creates window
+  createMainWindow();
 
   // IPC LISTENERS
-  ipc.on('convert-stuff', (e, arg) => { //main window calls when recording is finished
-    currentPath = arg;
+  // Main window calls when recording is finished
+  ipc.on('convert-stuff', (e, arg) => {
+    converterStatus = arg;
     convertOutputWindow();
   });
-  
-  ipc.on('converter-loaded', (e) => { //converter calls when DOM content is loaded
-    e.returnValue = currentPath;
+
+  // Converter calls when DOM content is loaded, which returns the path for the video
+  ipc.on('converter-loaded', (e) => {
+    e.returnValue = converterStatus;
   });
-  
-  //config thingy
-  ipc.on('data-request', (e) => { //whenever any ipc requests data, returns current data
+
+  // Config thingy
+  // Whenever any ipc requests data, returns current data
+  ipc.on('data-request', (e) => {
     e.returnValue = currentData;
-    console.log('')
   });
-  
-  ipc.on('write-data', (e, data) => { //config window calls when user wants to save preferences, and sets new config on the var
+
+  // Config window calls when user wants to save preferences, and sets new config on the object
+  ipc.on('write-data', (e, data) => {
     storage.set('config', data, (error) => {
       if (error) throw error;
       currentData = data;
-      log.info('saved data,', data);
+      // If shortcuts has been changed, registers shortcuts again
+      if (record !== data.recordShort || stopR !== data.stopShort || resume !== data.resumeShort || pause !== data.pauseShort) {
+        globalShortcut.unregisterAll();
+        
+        record = data.recordShort;
+        stopR = data.stopShort;
+
+        pause = data.pauseShort;
+        resume = data.resumeShort;
+
+        // Shortcuts
+
+        // If record and stop shortcuts are same, sends only one web content
+        // Start and Stop record
+        if (record == stopR && record !== '' && stopR !== '') {
+          globalShortcut.register(record, () => {
+            mainWindow.webContents.send('start-stop-shortcut');
+            console.log('record fired');
+          });
+        } else {
+          if (record !== '') {
+            globalShortcut.register(record, () => {
+              mainWindow.webContents.send('start-recording');
+            });
+          }
+          if (stopR !== '') {
+            globalShortcut.register(stopR, () => {
+              mainWindow.webContents.send('stop-recording');
+            });
+          }
+        }
+
+        // Pause and Resume
+        if (pause == resume && pause !== '' && resume !== '') {
+          globalShortcut.register(pause, () => {
+            mainWindow.webContents.send('pause-resume-shortcut');
+          });
+        } else {
+          if (pause !== '') {
+            globalShortcut.register(pause, () => {
+              mainWindow.webContents.send('pause-recording');
+            });
+          }
+          if (resume !== '') {
+            globalShortcut.register(resume, () => {
+              mainWindow.webContents.send('resume-recording');
+            });
+          }
+        }
+      }
     });
-    mainWindow.webContents.send('new-data-written', data); //sends data to main window for update
+    // Sends data to main window for update
+    mainWindow.webContents.send('new-data-written', data);
+  });
+  ipc.on('taskbar-percent', (e, data) => {
+    mainWindow.setProgressBar(data);
+  });
+  ipc.on('converter-done', (e) => {
+    mainWindow.setProgressBar(-1);
   });
 });
 
@@ -178,8 +295,13 @@ app.on('activate', () => {
   // On OS X it's common to re-create a window in the app when the
   // dock icon is clicked and there are no other windows open.
   if (BrowserWindow.getAllWindows().length === 0) {
-    createWindow();
+    createMainWindow();
   }
+});
+
+app.on('will-quit', () => {
+  // Unregister all shortcuts.
+  globalShortcut.unregisterAll();
 });
 
 // In this file you can include the rest of your app's specific main process
