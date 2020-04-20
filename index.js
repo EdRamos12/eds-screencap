@@ -71,10 +71,6 @@ const createMainWindow = () => {
     app.quit();
   });
   //mainWindow.webContents.openDevTools();
-  mainWindow.once('ready-to-show', () => {
-    autoUpdater.checkForUpdatesAndNotify();
-    console.log(app.getVersion());
-  });
 };
 
 // Preferences window
@@ -295,6 +291,10 @@ app.on('ready', function () {
   });
   ipc.on('converter-done', (e) => {
     mainWindow.setProgressBar(-1);
+  });
+  mainWindow.webContents.on('did-finish-load', () => {
+    console.log(app.getVersion());
+    autoUpdater.checkForUpdatesAndNotify();
   });
 });
 
