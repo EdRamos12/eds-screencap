@@ -97,5 +97,6 @@ config.json
 # Encoders json
 encoders.json
 
-# Electron-builder yml
+# Electron-builder
+dist/
 electron-builder.yml

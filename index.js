@@ -39,6 +39,8 @@ let defaultSettings = {
   resumeShort: ''
 }
 
+let newUpdate = false;
+
 let converterStatus; // String that will be passed to the converter
 let currentData; // Object which contains users preferences
 
@@ -67,7 +69,8 @@ const createMainWindow = () => {
   //mainWindow.webContents.openDevTools();
   mainWindow.once('ready-to-show', () => {
     autoUpdater.checkForUpdatesAndNotify();
-  });  
+    console.log(app.getVersion());
+  });
 };
 
 // Preferences window
@@ -232,7 +235,7 @@ app.on('ready', function () {
       // If shortcuts has been changed, registers shortcuts again
       if (record !== data.recordShort || stopR !== data.stopShort || resume !== data.resumeShort || pause !== data.pauseShort) {
         globalShortcut.unregisterAll();
-        
+
         record = data.recordShort;
         stopR = data.stopShort;
 
@@ -311,19 +314,33 @@ app.on('activate', () => {
 app.on('will-quit', () => {
   // Unregister all shortcuts.
   globalShortcut.unregisterAll();
-  autoUpdater.quitAndInstall();
+  if (newUpdate) {
+    autoUpdater.quitAndInstall();
+  }
 });
 
 // Auto updater
 autoUpdater.on('update-available', () => {
-  console.log('update avaliable');
+  console.log('update available');
 });
 
 autoUpdater.on('update-downloaded', () => {
+  mainWindow.setProgressBar(-1);
+  newUpdate = true;
+  var choice = require('electron').dialog.showMessageBox(this,
+    {
+      type: 'question',
+      buttons: ['Yes', 'No'],
+      title: 'Confirm',
+      message: 'New update available! Restart now?'
+    });
+  if (choice == 1) {
+    autoUpdater.quitAndInstall();
+  }
   mainWindow.webContents.send('update-downloaded');
 });
 
-autoUpdater.on('download-progress', (progressObj) => {
+autoUpdater.on('download-progress', () => {
   mainWindow.setProgressBar(2);
 })
 
