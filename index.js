@@ -62,7 +62,11 @@ const createMainWindow = () => {
   });
   // Load the index.html of the app.
   mainWindow.loadFile(path.join(__dirname, 'recorder/index.html'));
-
+  mainWindow.on('close', function(e){
+    if (newUpdate) {
+      autoUpdater.quitAndInstall();
+    }
+  })
   mainWindow.on('closed', function () {
     app.quit();
   });
@@ -314,9 +318,6 @@ app.on('activate', () => {
 app.on('will-quit', () => {
   // Unregister all shortcuts.
   globalShortcut.unregisterAll();
-  if (newUpdate) {
-    autoUpdater.quitAndInstall();
-  }
 });
 
 // Auto updater
@@ -327,17 +328,17 @@ autoUpdater.on('update-available', () => {
 autoUpdater.on('update-downloaded', () => {
   mainWindow.setProgressBar(-1);
   newUpdate = true;
-  var choice = require('electron').dialog.showMessageBox(this,
+  var choice = require('electron').dialog.showMessageBox(mainWindow,
     {
       type: 'question',
       buttons: ['Yes', 'No'],
       title: 'Confirm',
       message: 'New update available! Restart now?'
     });
-  if (choice == 1) {
+  if (choice == 0) {
     autoUpdater.quitAndInstall();
   }
-  mainWindow.webContents.send('update-downloaded');
+  //mainWindow.webContents.send('update-downloaded');
 });
 
 autoUpdater.on('download-progress', () => {
