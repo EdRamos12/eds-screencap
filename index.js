@@ -1,5 +1,6 @@
 // imports
 const electron = require('electron');
+const { autoUpdater } = require('electron-updater');
 const app = electron.app;
 const ipc = electron.ipcMain;
 const globalShortcut = electron.globalShortcut;
@@ -52,6 +53,7 @@ const createMainWindow = () => {
   mainWindow = new BrowserWindow({
     width: 800,
     height: 600,
+    icon: __dirname + '/icon/grr.ico',
     webPreferences: {
       nodeIntegration: true,
     }
@@ -62,8 +64,10 @@ const createMainWindow = () => {
   mainWindow.on('closed', function () {
     app.quit();
   });
-
   //mainWindow.webContents.openDevTools();
+  mainWindow.once('ready-to-show', () => {
+    autoUpdater.checkForUpdatesAndNotify();
+  });  
 };
 
 // Preferences window
@@ -73,6 +77,7 @@ function createConfigWindow() {
     width: 400,
     height: 650,
     parent: mainWindow,
+    icon: __dirname + '/icon/grr.ico',
     webPreferences: {
       nodeIntegration: true,
     }
@@ -306,7 +311,21 @@ app.on('activate', () => {
 app.on('will-quit', () => {
   // Unregister all shortcuts.
   globalShortcut.unregisterAll();
+  autoUpdater.quitAndInstall();
 });
+
+// Auto updater
+autoUpdater.on('update-available', () => {
+  console.log('update avaliable');
+});
+
+autoUpdater.on('update-downloaded', () => {
+  mainWindow.webContents.send('update-downloaded');
+});
+
+autoUpdater.on('download-progress', (progressObj) => {
+  mainWindow.setProgressBar(2);
+})
 
 // In this file you can include the rest of your app's specific main process
 // code. You can also put them in separate files and import them here.

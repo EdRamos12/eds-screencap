@@ -6,7 +6,6 @@ const { dialog } = remote;
 // Sets up ffmpeg
 const ffmpeg = require('fluent-ffmpeg');
 const ffmpegInstaller = require('@ffmpeg-installer/ffmpeg');
-const ffprobe = require('ffprobe-static');
 ffmpeg.setFfmpegPath(ffmpegInstaller.path); // Sets path for ffmpeg
 ffmpeg.getAvailableEncoders((err, encoders) => { // Get encoders
 	console.log('getAvailableEncoders', encoders);
@@ -65,7 +64,7 @@ document.addEventListener('DOMContentLoaded', function (e) {
 							console.log('temp deleted');
 						});
 						// Stops Promise
-						reject('failed' + err);
+						reject(err.message);
 						throw err;
 					}
 				})
@@ -93,15 +92,19 @@ document.addEventListener('DOMContentLoaded', function (e) {
 					resolve('Processing finished!');
 				})
 				.save(`${filePath}.${format}`);
+			let ntf = new Notification('All done!', {
+				body: 'Processing finished!',
+			})
+			ntf.onshow = function() {console.log('yoy')}
 		}).then((message) => { // Once Promise is over, alerts user it finished processing
 			ipcRenderer.send('converter-done');
-			alert(message);
-			remote.getCurrentWindow().close(); 
+			resolve('Processing finished!');
+			//remote.getCurrentWindow().close(); 
 		}).catch((message) => { // If Promise catches and error, it will show user the error message
 			dialog.showErrorBox('An error ocurred while converting', message);
 			remote.getCurrentWindow().close();
 		});
 	} catch (err) {
-		dialog.showErrorBox('An error ocurred while converting', err);
+		dialog.showErrorBox('An error ocurred while converting', err.message);
 	}
 });

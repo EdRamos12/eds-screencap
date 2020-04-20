@@ -1,15 +1,21 @@
 {
-  "name": "eds-screencap",
-  "productName": "eds-screencap",
+  "name": "golden-resource",
+  "productName": "golden-resource",
   "version": "0.1.0",
   "description": "Simple OBS-kinda thing to record your things!",
   "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/EdRamos12/eds-screencap.git"
+  },
   "scripts": {
     "start": "electron-forge start",
     "package": "electron-forge package",
     "make": "electron-forge make",
     "publish": "electron-forge publish",
-    "lint": "echo \"No linting configured\""
+    "lint": "echo \"No linting configured\"",
+    "build": "electron-builder build --win --publish never",
+    "deploy": "electron-builder build --win --publish always"
   },
   "keywords": [],
   "author": "Eduardo",
@@ -21,7 +27,7 @@
         {
           "name": "@electron-forge/maker-squirrel",
           "config": {
-            "name": "eds_screencap"
+            "name": "golden_resource"
           }
         },
         {
@@ -45,8 +51,8 @@
     "@ffmpeg-installer/ffmpeg": "^1.0.20",
     "bluebird": "^3.7.2",
     "electron-json-storage": "^4.1.8",
-    "electron-log": "^4.1.0",
     "electron-squirrel-startup": "^1.0.0",
+    "electron-updater": "^4.2.5",
     "fluent-ffmpeg": "^2.1.2"
   },
   "devDependencies": {
@@ -55,6 +61,7 @@
     "@electron-forge/maker-rpm": "6.0.0-beta.50",
     "@electron-forge/maker-squirrel": "6.0.0-beta.50",
     "@electron-forge/maker-zip": "6.0.0-beta.50",
-    "electron": "^8.1.1"
+    "electron": "^8.1.1",
+    "electron-builder": "^22.5.1"
   }
 }

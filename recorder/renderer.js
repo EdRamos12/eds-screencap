@@ -114,7 +114,7 @@ function microAudioCheck() {
       console.log('Received audio stream successfully.');
       microAudioStream = stream;
     }, (err) => {
-      dialog.showErrorBox('An error occurred', err);
+      dialog.showErrorBox('An error occurred', err.message);
     });
   }
   // If stream is already up, it refreshes the stream with the current source
@@ -216,8 +216,10 @@ function handleDataAvailable(e) {
 
 // Saves the video file on stop
 async function handleStop(e) {
+  if (durationDiscount !== 0 && durationDiscount !== undefined) {
+    videoDuration = videoDuration + (Date.now() - durationDiscount)
+  };
   let finalDuration = Date.now() - videoDuration;
-  console.log(finalDuration);
 
   // Creates blob, and then buffers from blob
   const blob = new Blob(recordedChunks, { type: 'video/webm' });
@@ -287,6 +289,7 @@ async function handleStop(e) {
   }
   // Video chunks will reset to an empty array
   recordedChunks = [];
+  durationDiscount = 0;
 }
 
 // IPC listeners
