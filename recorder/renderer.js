@@ -1,10 +1,13 @@
 // Imports
 const { desktopCapturer, remote, ipcRenderer } = require('electron');
 const { writeFileSync, statSync, mkdirSync } = require('fs');
-const { dialog, Menu } = remote;
+const { dialog, Menu, app } = remote;
 
 const { mix } = require('../util/mixAudio'); // Stream audio mixer
 require('../util/setTheme'); // Applies theme
+
+var appVersion = app.getVersion();
+console.log(appVersion)
 
 // Import current data from index.js
 let currentData = ipcRenderer.sendSync('data-request');
