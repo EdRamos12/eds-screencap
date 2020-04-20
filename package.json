@@ -1,7 +1,7 @@
 {
   "name": "golden-resource",
   "productName": "Golden Resource",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Simple OBS-kinda thing to record your things!",
   "main": "index.js",
   "repository": {
@@ -15,8 +15,7 @@
     "publish": "electron-forge publish",
     "lint": "echo \"No linting configured\"",
     "build": "electron-builder build --win --publish never",
-    "deploy": "electron-builder build --win --publish always",
-    "dist": "electron-builder --publish always"
+    "deploy": "electron-builder build --win --publish always"
   },
   "keywords": [],
   "author": "Eduardo",
