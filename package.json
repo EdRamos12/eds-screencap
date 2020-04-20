@@ -48,11 +48,11 @@
     }
   },
   "dependencies": {
-    "@ffmpeg-installer/ffmpeg": "^1.0.20",
     "bluebird": "^3.7.2",
     "electron-json-storage": "^4.1.8",
     "electron-squirrel-startup": "^1.0.0",
     "electron-updater": "^4.2.5",
+    "ffmpeg-static": "^4.1.1",
     "fluent-ffmpeg": "^2.1.2"
   },
   "devDependencies": {

@@ -5,8 +5,8 @@ const { dialog } = remote;
 
 // Sets up ffmpeg
 const ffmpeg = require('fluent-ffmpeg');
-const ffmpegInstaller = require('@ffmpeg-installer/ffmpeg');
-ffmpeg.setFfmpegPath(ffmpegInstaller.path); // Sets path for ffmpeg
+const ffmpegInstaller = require('ffmpeg-static');
+ffmpeg.setFfmpegPath(ffmpegInstaller.replace('app.asar', 'app.asar.unpacked')) // Sets path for ffmpeg
 ffmpeg.getAvailableEncoders((err, encoders) => { // Get encoders
 	console.log('getAvailableEncoders', encoders);
 });
@@ -99,7 +99,7 @@ document.addEventListener('DOMContentLoaded', function (e) {
 		}).then((message) => { // Once Promise is over, alerts user it finished processing
 			ipcRenderer.send('converter-done');
 			resolve('Processing finished!');
-			//remote.getCurrentWindow().close(); 
+			remote.getCurrentWindow().close(); 
 		}).catch((message) => { // If Promise catches and error, it will show user the error message
 			dialog.showErrorBox('An error ocurred while converting', message);
 			remote.getCurrentWindow().close();
