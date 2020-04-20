@@ -38,6 +38,7 @@ const pauseB = document.getElementById('pause');
 const resumeB = document.getElementById('resume');
 const microAudio = document.getElementById('micro-audio');
 const sysAudio = document.getElementById('sys-audio');
+const span = document.querySelector('span');
 const root = document.documentElement;
 
 //Buttons event listeners
@@ -322,9 +323,9 @@ ipcRenderer.on('new-data-written', (e, data) => {
 });
 
 // IPC Listeners
-ipcRenderer.on('start-recording', () => { if (!isRecording) startR() });
+ipcRenderer.on('start-recording', () => { if (!isRecording) startR(); if (currentSource == undefined) startR();} );
 ipcRenderer.on('stop-recording', () => { if (isRecording || mediaRecorder.state === 'paused') stopR() });
-ipcRenderer.on('start-stop-shortcut', () => { if (isRecording || mediaRecorder.state === 'paused') { stopR() } else if (!isRecording) { startR() }; });
+ipcRenderer.on('start-stop-shortcut', () => { if (isRecording || mediaRecorder.state === 'paused') { stopR() } else if (!isRecording) { startR() };});
 
 ipcRenderer.on('pause-recording', () => { if (mediaRecorder.state === 'recording') { pauseR() }; });
 ipcRenderer.on('resume-recording', () => { if (mediaRecorder.state === 'paused') { resumeR() }; });
@@ -334,4 +335,9 @@ ipcRenderer.on('pause-resume-shortcut', () => {
   } else if (mediaRecorder !== undefined && mediaRecorder.state === 'paused') {
     resumeR();
   }; 
+})
+
+ipcRenderer.on('update-message', (e, message) => {
+  //span.innerText = message;
+  console.log(message);
 })

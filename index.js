@@ -1,13 +1,8 @@
 // imports
-const electron = require('electron');
+const { app, ipcMain, globalShortcut, BrowserWindow, Menu, dialog } = require('electron');
 const { autoUpdater } = require('electron-updater');
-const app = electron.app;
-const ipc = electron.ipcMain;
-const globalShortcut = electron.globalShortcut;
-const BrowserWindow = electron.BrowserWindow;
 const Bluebird = require('bluebird');
 const path = require('path');
-const Menu = electron.Menu;
 
 // Sets up storage path
 const storage = Bluebird.promisifyAll(require('electron-json-storage'));
@@ -62,11 +57,6 @@ const createMainWindow = () => {
   });
   // Load the index.html of the app.
   mainWindow.loadFile(path.join(__dirname, 'recorder/index.html'));
-  mainWindow.on('close', function(e){
-    if (newUpdate) {
-      autoUpdater.quitAndInstall();
-    }
-  })
   mainWindow.on('closed', function () {
     app.quit();
   });
@@ -211,24 +201,24 @@ app.on('ready', function () {
 
   // IPC LISTENERS
   // Main window calls when recording is finished
-  ipc.on('convert-stuff', (e, arg) => {
+  ipcMain.on('convert-stuff', (e, arg) => {
     converterStatus = arg;
     convertOutputWindow();
   });
 
   // Converter calls when DOM content is loaded, which returns the path for the video
-  ipc.on('converter-loaded', (e) => {
+  ipcMain.on('converter-loaded', (e) => {
     e.returnValue = converterStatus;
   });
 
   // Config thingy
   // Whenever any ipc requests data, returns current data
-  ipc.on('data-request', (e) => {
+  ipcMain.on('data-request', (e) => {
     e.returnValue = currentData;
   });
 
   // Config window calls when user wants to save preferences, and sets new config on the object
-  ipc.on('write-data', (e, data) => {
+  ipcMain.on('write-data', (e, data) => {
     storage.set('config', data, (error) => {
       if (error) throw error;
       currentData = data;
@@ -286,15 +276,16 @@ app.on('ready', function () {
     // Sends data to main window for update
     mainWindow.webContents.send('new-data-written', data);
   });
-  ipc.on('taskbar-percent', (e, data) => {
+  ipcMain.on('taskbar-percent', (e, data) => {
     mainWindow.setProgressBar(data);
   });
-  ipc.on('converter-done', (e) => {
+  ipcMain.on('converter-done', (e) => {
     mainWindow.setProgressBar(-1);
   });
-  mainWindow.webContents.on('did-finish-load', () => {
-    console.log(app.getVersion());
+  mainWindow.webContents.on('did-finish-load', async function () {
+    autoUpdater.autoDownload = false;
     autoUpdater.checkForUpdatesAndNotify();
+    console.log(app.getVersion());
   });
 });
 
@@ -321,28 +312,50 @@ app.on('will-quit', () => {
 });
 
 // Auto updater
-autoUpdater.on('update-available', () => {
-  console.log('update available');
-});
 
-autoUpdater.on('update-downloaded', () => {
-  mainWindow.setProgressBar(-1);
-  newUpdate = true;
-  var choice = require('electron').dialog.showMessageBox(mainWindow,
+autoUpdater.on('checking-for-update', () => {
+  mainWindow.webContents.send('update-message', 'checking updates smh');
+})
+
+autoUpdater.on('update-available', async function() {
+  mainWindow.webContents.send('update-message', 'Update available!');
+  let choice = await dialog.showMessageBox(mainWindow,
     {
       type: 'question',
       buttons: ['Yes', 'No'],
-      title: 'Confirm',
-      message: 'New update available! Restart now?'
+      title: 'Download update',
+      message: 'New update available! Do you want to download it?'
     });
-  if (choice == 0) {
-    autoUpdater.quitAndInstall();
+  if (choice.response == 0) {
+    autoUpdater.downloadUpdate();
   }
-  //mainWindow.webContents.send('update-downloaded');
+});
+
+autoUpdater.on('update-downloaded', async function() {
+  mainWindow.setProgressBar(-1);
+  newUpdate = true;
+  let choice = await dialog.showMessageBox(mainWindow,
+    {
+      type: 'question',
+      buttons: ['Yes', 'No'],
+      title: 'Restart',
+      message: 'Update downloaded. Restart now?'
+    });
+  if (choice.response == 0) {
+    autoUpdater.quitAndInstall();
+  } else {
+    autoUpdater.autoInstallOnAppQuit = true;
+  }
+  mainWindow.webContents.send('update-message', 'downloaded lol');
 });
 
 autoUpdater.on('download-progress', () => {
+  mainWindow.webContents.send('update-message', 'downling');
   mainWindow.setProgressBar(2);
+})
+
+autoUpdater.on('error', (err) => {
+  mainWindow.webContents.send('update-message', err);
 })
 
 // In this file you can include the rest of your app's specific main process
