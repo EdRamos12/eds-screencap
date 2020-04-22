@@ -4,7 +4,8 @@ const { autoUpdater } = require('electron-updater');
 const Bluebird = require('bluebird');
 
 const { registerShortcuts } = require('./shortcuts');
-const { createConfigWindow, createMainWindow, createConvertOutputWindow } = require('./renderers');
+const { createConfigWindow, createMainWindow } = require('./renderers');
+const { registerIpcHandlers } = require('./ipc-listeners');
 //const { getSettings } = require('./json-storage');
 
 // Sets up storage path
@@ -31,7 +32,7 @@ let defaultSettings = {
   resumeShort: ''
 }
 
-let currentData;
+let currentData, mainWindow;
 
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
@@ -78,56 +79,16 @@ app.on('ready', async function () {
     } else {
       currentData = data;
     }
+    // Shortcuts
     registerShortcuts(currentData, mainWindow);
-  });
 
-  // Creates window
+    // IPC LISTENERS
+    registerIpcHandlers(currentData, mainWindow);
+  });
+  // Initializes main window
   mainWindow = createMainWindow();
   mainWindow.on('closed', function () {
     app.quit();
-  });
-
-  // IPC LISTENERS
-  // Main window calls when recording is finished
-  ipcMain.on('convert-stuff', (e, arg) => {
-    converterStatus = arg;
-    createConvertOutputWindow();
-  });
-
-  // Converter calls when DOM content is loaded, which returns the path for the video
-  ipcMain.on('converter-loaded', (e) => {
-    e.returnValue = converterStatus;
-  });
-
-  // Config thingy
-  // Whenever any ipc requests data, returns current data
-  ipcMain.on('data-request', (e) => {
-    e.returnValue = currentData;
-  });
-
-  // Config window calls when user wants to save preferences, and sets new config on the object
-  ipcMain.on('write-data', (e, data) => {
-    storage.set('config', data, (err) => {
-      if (err) throw err;
-    });
-    currentData = data;
-    if (currentData != data) {
-      globalShortcut.unregisterAll();
-      registerShortcuts(data, mainWindow);
-    }
-    // Sends data to main window for update
-    mainWindow.webContents.send('new-data-written', data);
-  });
-  ipcMain.on('taskbar-percent', (e, data) => {
-    mainWindow.setProgressBar(data);
-  });
-  ipcMain.on('converter-done', (e) => {
-    mainWindow.setProgressBar(-1);
-  });
-  mainWindow.webContents.on('did-finish-load', async function () {
-    autoUpdater.autoDownload = false;
-    autoUpdater.checkForUpdatesAndNotify();
-    console.log(app.getVersion());
   });
 });
 
