@@ -92,13 +92,9 @@ document.addEventListener('DOMContentLoaded', function (e) {
 					resolve('Processing finished!');
 				})
 				.save(`${filePath}.${format}`);
-			let ntf = new Notification('All done!', {
-				body: 'Processing finished!',
-			})
-			ntf.onshow = function() {console.log('yoy')}
 		}).then((message) => { // Once Promise is over, alerts user it finished processing
 			ipcRenderer.send('converter-done');
-			resolve('Processing finished!');
+			alert(message);
 			remote.getCurrentWindow().close(); 
 		}).catch((message) => { // If Promise catches and error, it will show user the error message
 			dialog.showErrorBox('An error ocurred while converting', message);

@@ -7,7 +7,7 @@ const { mix } = require('../util/mixAudio'); // Stream audio mixer
 require('../util/setTheme'); // Applies theme
 
 var appVersion = app.getVersion();
-console.log(appVersion)
+console.log(appVersion);
 
 // Import current data from index.js
 let currentData = ipcRenderer.sendSync('data-request');
@@ -53,6 +53,7 @@ const startR = () => {
     startB.style.display = 'none';
     stopB.style.display = 'block';
     stopB.innerText = 'Recording... Click to stop.';
+    document.querySelectorAll('label').forEach(checkbox => checkbox.style.display = 'none')
   } else alert('Select a video source to record!');
 }
 
@@ -64,6 +65,7 @@ const stopR = () => {
   stopB.style.display = 'none';
   pauseB.style.display = 'none';
   resumeB.style.display = 'none';
+  document.querySelectorAll('label').forEach(checkbox => checkbox.style.display = 'block')
 }
 
 // Pauses recording
@@ -322,7 +324,6 @@ ipcRenderer.on('new-data-written', (e, data) => {
   }
 });
 
-// IPC Listeners
 ipcRenderer.on('start-recording', () => { if (!isRecording) startR(); if (currentSource == undefined) startR();} );
 ipcRenderer.on('stop-recording', () => { if (isRecording || mediaRecorder.state === 'paused') stopR() });
 ipcRenderer.on('start-stop-shortcut', () => { if (isRecording || mediaRecorder.state === 'paused') { stopR() } else if (!isRecording) { startR() };});

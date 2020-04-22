@@ -128,6 +128,22 @@ function addMultipleShortcutListener() {
 }
 
 addMultipleShortcutListener(recordShort, stopShort, pauseShort, resumeShort);
+si.graphics().then(data => {
+	for (let i = 0; i < data.controllers.length; i++) {
+		const graphicsVendor = data.controllers[i].vendor;
+		console.log(graphicsVendor);
+		switch (graphicsVendor) {
+			case 'Intel':
+				console.log('ya');
+				break;
+			case 'NVIDIA':
+				console.log('ya nvidia');
+				break;
+			case 'AMD':
+				break;
+		}
+	}
+})
 
 document.getElementById('clearAll').onclick = () => {
 	recordShort.value = '';
