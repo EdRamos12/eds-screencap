@@ -3,7 +3,9 @@ const { autoUpdater } = require('electron-updater');
 const { createConvertOutputWindow } = require('./renderers');
 const Bluebird = require('bluebird');
 const storage = Bluebird.promisifyAll(require('electron-json-storage'));
-storage.setDataPath(process.cwd());
+storage.setDataPath(app.getPath('userData'));
+
+let converterStatus;
 
 module.exports.registerIpcHandlers = function (currentData, window) {
 	// Main window calls when recording is finished
@@ -16,7 +18,7 @@ module.exports.registerIpcHandlers = function (currentData, window) {
 	ipcMain.on('converter-loaded', (e) => {
 		e.returnValue = converterStatus;
 	});
-	
+
 	// Whenever any ipc requests data, returns current data
 	ipcMain.on('data-request', (e) => {
 		e.returnValue = currentData;
@@ -35,15 +37,23 @@ module.exports.registerIpcHandlers = function (currentData, window) {
 		// Sends data to main window for update
 		window.webContents.send('new-data-written', data);
 	});
+
+	// Makes taskbar progress bar appear according to converting process 
 	ipcMain.on('taskbar-percent', (e, data) => {
 		window.setProgressBar(data);
 	});
+
+	// Sets taskbar progress back to normal
 	ipcMain.on('converter-done', (e) => {
 		window.setProgressBar(-1);
 	});
-	window.webContents.on('did-finish-load', async function () {
-		autoUpdater.autoDownload = false;
-		autoUpdater.checkForUpdatesAndNotify();
-		console.log(app.getVersion());
+
+	ipcMain.on('converter-failed', (e) => {
+		window.setProgressBar(-1);
+		window.webContents.send('save-bkp', converterStatus);
+	});
+
+	ipcMain.on('do-update', (e) => {
+		autoUpdater.quitAndInstall();
 	});
 }

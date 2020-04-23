@@ -4,7 +4,7 @@
 }
 
 body {
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont,  Roboto, "Segoe UI", Helvetica, Arial, sans-serif;
   margin: auto;
   max-width: 38rem;
   font-size: 1.2em;
@@ -242,4 +242,10 @@ select {
   background: #4CAF50;
   margin: 20px 0;
   height: 20px;
+}
+
+#install-update {
+  display: none;
+  color: #22c91c;
+  cursor: pointer;
 }

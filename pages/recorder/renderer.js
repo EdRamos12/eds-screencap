@@ -1,6 +1,6 @@
 // Imports
 const { desktopCapturer, remote, ipcRenderer } = require('electron');
-const { writeFileSync, statSync, mkdirSync } = require('fs');
+const { writeFileSync, statSync, mkdirSync, renameSync, rmdir } = require('fs');
 const { dialog, Menu, app } = remote;
 
 const { mix } = require('../util/mixAudio'); // Stream audio mixer
@@ -38,8 +38,11 @@ const pauseB = document.getElementById('pause');
 const resumeB = document.getElementById('resume');
 const microAudio = document.getElementById('micro-audio');
 const sysAudio = document.getElementById('sys-audio');
-const span = document.querySelector('span');
+const instUpdate = document.getElementById('install-update');
 const root = document.documentElement;
+
+document.getElementById('version').innerText = 'Release v' + app.getVersion();
+instUpdate.onclick = () => {ipcRenderer.send('do-update')}
 
 //Buttons event listeners
 
@@ -53,7 +56,8 @@ const startR = () => {
     startB.style.display = 'none';
     stopB.style.display = 'block';
     stopB.innerText = 'Recording... Click to stop.';
-    document.querySelectorAll('label').forEach(checkbox => checkbox.style.display = 'none')
+    document.querySelectorAll('label').forEach(checkbox => checkbox.style.display = 'none');
+    videoBtn.style.display = 'none';
   } else alert('Select a video source to record!');
 }
 
@@ -65,7 +69,8 @@ const stopR = () => {
   stopB.style.display = 'none';
   pauseB.style.display = 'none';
   resumeB.style.display = 'none';
-  document.querySelectorAll('label').forEach(checkbox => checkbox.style.display = 'block')
+  videoBtn.style.display = 'inline-block';
+  document.querySelectorAll('label').forEach(checkbox => checkbox.style.display = 'inline-block');
 }
 
 // Pauses recording
@@ -279,6 +284,7 @@ async function handleStop(e) {
       let sendConverter = {
         path: filePath,
         duration: finalDuration,
+        vidTitle: title 
       }
       ipcRenderer.send('convert-stuff', sendConverter);
 
@@ -336,9 +342,34 @@ ipcRenderer.on('pause-resume-shortcut', () => {
   } else if (mediaRecorder !== undefined && mediaRecorder.state === 'paused') {
     resumeR();
   }; 
-})
+});
 
 ipcRenderer.on('update-message', (e, message) => {
-  //span.innerText = message;
+  document.getElementById('progress').innerText = message;
+  if (message.includes(`Download completed`)) {
+    instUpdate.style.display = 'block';
+  }
   console.log(message);
-})
+});
+
+ipcRenderer.on('save-bkp', async function(e, data) {
+  try {
+    let { filePath } = await dialog.showSaveDialog({
+      buttonLabel: 'Save video',
+      defaultPath: data.vidTitle + '.bkp.webm',
+      filters: [
+        { name: 'Movies', extensions: ['webm'] },
+      ]
+    });
+    if (!filePath.includes('.webm')) filePath += '.webm';
+    renameSync('temp/toConvert.webm', filePath, function(err) {
+      console.log('Successfully moved!');
+    });
+    rmdir('temp', function (err) {
+      if (err) throw err;
+      console.log('temp deleted');
+    });
+  } catch (err) {
+    console.error('something happened', err);
+  }
+});

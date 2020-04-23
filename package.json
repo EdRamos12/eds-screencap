@@ -1,7 +1,7 @@
 {
   "name": "golden-resource",
   "productName": "Golden Resource",
-  "version": "0.1.2",
+  "version": "0.2.1",
   "description": "Simple OBS-kinda thing to record your things!",
   "main": "main/index.js",
   "repository": {

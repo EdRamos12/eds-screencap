@@ -1,16 +1,17 @@
 // imports
-const { app, ipcMain, globalShortcut, Menu, dialog } = require('electron');
+const { app, globalShortcut, Menu, dialog } = require('electron');
 const { autoUpdater } = require('electron-updater');
+autoUpdater.autoInstallOnAppQuit = true;
 const Bluebird = require('bluebird');
 
 const { registerShortcuts } = require('./shortcuts');
-const { createConfigWindow, createMainWindow } = require('./renderers');
+const { createConfigWindow, createMainWindow, createConvertOutputWindow } = require('./renderers');
 const { registerIpcHandlers } = require('./ipc-listeners');
 //const { getSettings } = require('./json-storage');
 
 // Sets up storage path
 const storage = Bluebird.promisifyAll(require('electron-json-storage'));
-storage.setDataPath(process.cwd());
+storage.setDataPath(app.getPath('userData'));
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (require('electron-squirrel-startup')) { // eslint-disable-line global-require
@@ -48,6 +49,51 @@ app.on('ready', async function () {
       { type: 'separator' },
 
       {
+        label: 'Convert backup webm',
+        submenu: [
+          {
+            label: 'With default settings',
+            click: function() {
+              let filePath = dialog.showOpenDialogSync({
+                buttonLabel: 'Convert video!',
+                filters: [
+                  { name: 'Movies', extensions: ['webm'] },
+                ]
+              })[0];
+              console.log(filePath);
+              configWin = createConvertOutputWindow();
+              configWin.webContents.on('did-finish-load', async function () {
+                configWin.webContents.send('convert-backup', {
+                  path: filePath,
+                  settings: defaultSettings
+                });
+              });
+            }
+            
+          },
+          {
+            label: 'With saved settings',
+            click: function() {
+              let filePath = dialog.showOpenDialogSync({
+                buttonLabel: 'Convert video!',
+                filters: [
+                  { name: 'Movies', extensions: ['webm'] },
+                ]
+              })[0];
+              configWin = createConvertOutputWindow();
+              configWin.webContents.on('did-finish-load', async function () {
+                configWin.webContents.send('convert-backup', {
+                  path: filePath,
+                  settings: currentData
+                });
+              });
+            }
+          }
+        ]
+      },
+
+      { type: 'separator' },
+      {
         label: 'Preferences',
         click: function () { createConfigWindow() }
       },
@@ -55,7 +101,7 @@ app.on('ready', async function () {
     ],
   }];
   // If app is in development, option for dev tools will appear on menu
-  if (process.env.NODE_ENV !== 'production') {
+  if (!app.isPackaged) {
     template.push({
       label: 'Developer Tools',
       submenu: [{
@@ -90,6 +136,12 @@ app.on('ready', async function () {
   mainWindow.on('closed', function () {
     app.quit();
   });
+  mainWindow.webContents.on('did-finish-load', async function () {
+    autoUpdater.autoDownload = false;
+    console.log(autoUpdater);
+		autoUpdater.checkForUpdatesAndNotify();
+		console.log(app.getVersion());
+	});
 });
 
 app.on('will-quit', () => {
@@ -98,10 +150,6 @@ app.on('will-quit', () => {
 });
 
 // Auto updater
-
-autoUpdater.on('checking-for-update', () => {
-  mainWindow.webContents.send('update-message', 'checking updates smh');
-})
 
 autoUpdater.on('update-available', async function () {
   mainWindow.webContents.send('update-message', 'Update available!');
@@ -116,22 +164,23 @@ autoUpdater.on('update-available', async function () {
   }
 });
 
-autoUpdater.on('update-downloaded', async function () {
+autoUpdater.on('update-downloaded', async function (event, releaseNotes, releaseName) {
   mainWindow.setProgressBar(-1);
   let choice = await dialog.showMessageBox(mainWindow, {
     type: 'question',
-    buttons: ['Yes', 'No'],
+    buttons: ['Restart now', 'Install later'],
     title: 'Restart',
-    message: 'Update downloaded. Restart now?'
+    message: releaseNotes,
+    detail: 'A new version has been downloaded. Restart the application to apply the updates. Closing the app will update.',
   });
   if (choice.response == 0) {
     autoUpdater.quitAndInstall();
   }
-  mainWindow.webContents.send('update-message', 'downloaded lol');
+  mainWindow.webContents.send('update-message', `Download completed!`);
 });
 
 autoUpdater.on('download-progress', (progressObj) => {
-  mainWindow.webContents.send('update-message', `downloading, ${progressObj}%`);
+  mainWindow.webContents.send('update-message', `Downloading (${parseInt(progressObj.percent)}%)`);
   mainWindow.setProgressBar(2);
 })
 
