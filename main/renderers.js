@@ -15,6 +15,7 @@ const createMainWindow = () => {
 	// Load the index.html of the app.
 	mainWindow.loadFile(path.join(__dirname, '../pages/recorder/index.html'));
 	//mainWindow.webContents.openDevTools();
+	mainWindow.setMenuBarVisibility(false);
 	return mainWindow;
 };
 
@@ -58,8 +59,33 @@ function createConvertOutputWindow() {
 	return converterWindow;
 }
 
+function createCropWindow() {
+	cropWindow = new BrowserWindow({
+		width: 500,
+		height: 500,
+		icon: process.cwd() + '/build/grr.ico',
+		transparent: true,
+		frame: false,
+		resizable: true,
+		'minHeight': 300,
+		'minWidth': 300,
+		
+		webPreferences: {
+			nodeIntegration: true,
+		}
+	});
+	// Load the convert.html of the window.
+	cropWindow.loadFile(path.join(__dirname, '../pages/crop/index.html'));
+	// On close, window will be set to null
+	cropWindow.on('close', function () { converterWindow = null });
+	cropWindow.setMenuBarVisibility(false);
+	cropWindow.setIgnoreMouseEvents(false);
+	return cropWindow;
+}
+
 module.exports = {
 	createMainWindow,
 	createConfigWindow,
 	createConvertOutputWindow,
+	createCropWindow,
 }

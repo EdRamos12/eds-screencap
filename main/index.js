@@ -5,7 +5,7 @@ autoUpdater.autoInstallOnAppQuit = true;
 const Bluebird = require('bluebird');
 
 const { registerShortcuts } = require('./shortcuts');
-const { createConfigWindow, createMainWindow, createConvertOutputWindow } = require('./renderers');
+const { createMainWindow } = require('./renderers');
 const { registerIpcHandlers } = require('./ipc-listeners');
 //const { getSettings } = require('./json-storage');
 
@@ -38,81 +38,7 @@ let currentData, mainWindow;
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
-app.on('ready', async function () {
-  // Menu template for project
-  const template = [{
-    label: 'File',
-    submenu: [
-      { role: 'reload' },
-      { role: 'forceReload' },
-
-      { type: 'separator' },
-
-      {
-        label: 'Convert backup webm',
-        submenu: [
-          {
-            label: 'With default settings',
-            click: function() {
-              let filePath = dialog.showOpenDialogSync({
-                buttonLabel: 'Convert video!',
-                filters: [
-                  { name: 'Movies', extensions: ['webm'] },
-                ]
-              })[0];
-              console.log(filePath);
-              configWin = createConvertOutputWindow();
-              configWin.webContents.on('did-finish-load', async function () {
-                configWin.webContents.send('convert-backup', {
-                  path: filePath,
-                  settings: defaultSettings
-                });
-              });
-            }
-            
-          },
-          {
-            label: 'With saved settings',
-            click: function() {
-              let filePath = dialog.showOpenDialogSync({
-                buttonLabel: 'Convert video!',
-                filters: [
-                  { name: 'Movies', extensions: ['webm'] },
-                ]
-              })[0];
-              configWin = createConvertOutputWindow();
-              configWin.webContents.on('did-finish-load', async function () {
-                configWin.webContents.send('convert-backup', {
-                  path: filePath,
-                  settings: currentData
-                });
-              });
-            }
-          }
-        ]
-      },
-
-      { type: 'separator' },
-      {
-        label: 'Preferences',
-        click: function () { createConfigWindow() }
-      },
-      { role: 'quit' },
-    ],
-  }];
-  // If app is in development, option for dev tools will appear on menu
-  if (!app.isPackaged) {
-    template.push({
-      label: 'Developer Tools',
-      submenu: [{
-        role: 'toggleDevTools'
-      }]
-    });
-  }
-  // Builds up menu from the template
-  const menu = Menu.buildFromTemplate(template);
-  Menu.setApplicationMenu(menu);
-
+app.on('ready', async function () {  
   // Make/get preferences
   storage.getAsync('config', function (error, data) {
     if (error) throw error;
@@ -138,10 +64,13 @@ app.on('ready', async function () {
   });
   mainWindow.webContents.on('did-finish-load', async function () {
     autoUpdater.autoDownload = false;
-    console.log(autoUpdater);
-		autoUpdater.checkForUpdatesAndNotify();
-		console.log(app.getVersion());
-	});
+    autoUpdater.checkForUpdatesAndNotify();
+    //console.log(app.getVersion());
+    //createCropWindow();
+  });
+  //setInterval(() => {
+  //console.log(mainWindow.getPosition());
+  //}, 1000)
 });
 
 app.on('will-quit', () => {

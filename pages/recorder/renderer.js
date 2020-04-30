@@ -4,6 +4,7 @@ const { writeFileSync, statSync, mkdirSync, renameSync, rmdir } = require('fs');
 const { dialog, Menu, app } = remote;
 
 const { mix } = require('../util/mixAudio'); // Stream audio mixer
+const { createConfigWindow } = require('../../main/renderers');
 require('../util/setTheme'); // Applies theme
 
 var appVersion = app.getVersion();
@@ -41,8 +42,15 @@ const sysAudio = document.getElementById('sys-audio');
 const instUpdate = document.getElementById('install-update');
 const root = document.documentElement;
 
-document.getElementById('version').innerText = 'Release v' + app.getVersion();
+//document.getElementById('version').innerText = 'Release v' + app.getVersion();
 instUpdate.onclick = () => {ipcRenderer.send('do-update')}
+
+document.getElementById('open-cfg').onclick = () => {
+  ipcRenderer.send('open-cfg');
+}
+document.getElementById('exit').onclick = () => {
+  remote.getCurrentWindow().close();
+}
 
 //Buttons event listeners
 
@@ -70,7 +78,7 @@ const stopR = () => {
   pauseB.style.display = 'none';
   resumeB.style.display = 'none';
   videoBtn.style.display = 'inline-block';
-  document.querySelectorAll('label').forEach(checkbox => checkbox.style.display = 'inline-block');
+  document.querySelectorAll('label').forEach(checkbox => checkbox.style.display = 'flex');
 }
 
 // Pauses recording
@@ -143,7 +151,7 @@ async function getVideoSources(inputTypes = ['window', 'screen']) {
   const inputSources = await desktopCapturer.getSources({
     types: inputTypes
   });
-
+  console.log(inputSources);
   // Builds menu from inputSources
   const videoOptionsMenu = Menu.buildFromTemplate(
     inputSources.map(source => {
@@ -159,7 +167,7 @@ async function getVideoSources(inputTypes = ['window', 'screen']) {
       };
     })
   );
-
+  console.log(videoOptionsMenu);
   videoOptionsMenu.popup();
   videoBtn.innerText = getText;
 }
@@ -201,6 +209,7 @@ async function selectSource(source) {
   // If every condition fails, user will record sys audio only
 
   // Preview the source in a video element
+  console.log(localStream.getVideoTracks()[0].getSettings())
   videoBtn.innerText = windowCaptured;
   videoE.srcObject = localStream;
   videoE.play();

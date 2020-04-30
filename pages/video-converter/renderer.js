@@ -6,7 +6,7 @@ const { dialog } = remote;
 // Sets up ffmpeg
 const ffmpeg = require('fluent-ffmpeg');
 const ffmpegInstaller = require('ffmpeg-static');
-ffmpeg.setFfmpegPath(ffmpegInstaller.replace('app.asar', 'app.asar.unpacked')) // Sets path for ffmpeg
+ffmpeg.setFfmpegPath(ffmpegInstaller.replace('app.asar', 'app.asar.unpacked')) // replace .asar path to unpacked lib
 ffmpeg.getAvailableEncoders((err, encoders) => { // Get encoders
 	console.log('getAvailableEncoders', encoders);
 });

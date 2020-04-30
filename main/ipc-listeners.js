@@ -1,6 +1,6 @@
 const { ipcMain, app } = require('electron');
 const { autoUpdater } = require('electron-updater');
-const { createConvertOutputWindow } = require('./renderers');
+const { createConfigWindow, createConvertOutputWindow } = require('./renderers');
 const Bluebird = require('bluebird');
 const storage = Bluebird.promisifyAll(require('electron-json-storage'));
 storage.setDataPath(app.getPath('userData'));
@@ -55,5 +55,9 @@ module.exports.registerIpcHandlers = function (currentData, window) {
 
 	ipcMain.on('do-update', (e) => {
 		autoUpdater.quitAndInstall();
+	});
+
+	ipcMain.on('open-cfg', (e) => {
+		createConfigWindow();
 	});
 }

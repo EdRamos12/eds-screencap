@@ -1,51 +1,82 @@
 <!DOCTYPE html>
-<html>
+<html style="width: 100%; height: 100%;">
   <head>
     <meta charset="UTF-8" />
     <title>Golden Resource</title>
     <link rel="stylesheet" href="../style.css" />
+    <link rel="stylesheet" href="../util/icons/material-icons.css" />
     <script defer src="renderer.js" type="module"></script>
   </head>
-  <body>
+  <body style="width: 100%; height: 100%; overflow-y: auto;">
     <div class="app">
-      <h1>Golden Resource</h1>
-      <h3 style="margin: 0">
-        <span id="version"></span><br>
+      <!--<img src="../../build/header.png" alt="" width="60%" style="margin: 10px 0">-->
+      <div class="header">
+        <button id="open-cfg">
+          <i class="material-icons">settings</i> Settings
+        </button>
+        <button id="convert-bkp">
+          <i class="material-icons">settings_backup_restore</i> Convert from
+          backup
+        </button>
+        <button id="exit">
+          <i class="material-icons">exit_to_app</i> Exit
+        </button>
+      </div>
+      <div class="preview-stuff">
+        <input type="checkbox" id="show-preview" style="display: none;" checked  />
+        <div class="preview" style="display: flex; height: 50vh">
+          <div class="vid-preview">
+            <video muted></video>
+          </div>
+          <div class="resize"></div>
+        </div>
+        <label for="show-preview" id="preview-button">
+          <i class="material-icons">visibility_off</i>
+          <i class="material-icons">visibility</i>
+          Preview
+        </label>
+      </div>
+      <!--<h1>Golden Resource</h1>-->
+      <h3 style="margin: 0;">
+        <!--<span id="version"></span><br>-->
         <span id="progress"></span>
         <span id="install-update">Click here to apply the update.</span>
       </h3>
-      <h4>
-        To start recording things, just press the green button! You can change
-        which window you want at the bottom of the window.
-      </h4>
-
-      <h4>Preview video:</h4>
-      <div class="video-config">
-        <video width="100%" muted></video>
-        <div class="ck-button" id="micro-audio-btn">
-          <label> 
-            <input type="checkbox" id="micro-audio" value="false">
-            <i class="ti-microphone" title="Include Microphone Audio">Include Microphone Audio</i>
-          </label>
-          <label>
-            <input type="checkbox" id="sys-audio" checked value="true">
-            <i class="ti-microphone" title="Include System Audio">Include System Audio</i>
-          </label>
-          <br><span></span>
+      <div class="ssss" style="display: flex; flex-direction: column; background: #2d2d2d2e; margin: 10px; flex-grow : 1; margin-bottom: 8px; justify-content: center;">
+        <div class="video-config">
+          <div class="ck-button" id="micro-audio-btn">
+            <input type="checkbox" id="micro-audio" value="false" style="display: none;" />
+            <label for="micro-audio" id="micro-button">
+              <i class="material-icons">mic_off</i>
+              <i class="material-icons">mic</i>
+              Microphone audio
+            </label>
+            <input type="checkbox" id="sys-audio" checked value="true" style="display: none;" />
+            <label for="sys-audio" id="sys-button">
+              <i class="material-icons">volume_off</i>
+              <i class="material-icons">volume_up</i>
+              System Audio
+            </label>
+          </div>
+          <button id="videoSelectBtn">Choose a video source</button>
         </div>
-        <button id="videoSelectBtn">Choose a video source</button>
-      </div>
 
-      <div class="buttons">
-        <div class="vid-manipulators">
-          <button id="pause"><img src="img/pause.png" alt="Puase" width="10%"></button>
-          <button id="resume"><img src="img/resume.png" alt="Resume" width="10%"></button>
-        </div>
-        <div class="main">
-          <button id="startBtn">Start recording!</button>
-          <button id="stopBtn">Stop</button>
+        <div class="buttons">
+          <div class="vid-manipulators">
+            <button id="pause">
+              <img src="img/pause.png" alt="Puase" width="10%" />
+            </button>
+            <button id="resume">
+              <img src="img/resume.png" alt="Resume" width="10%" />
+            </button>
+          </div>
+          <div class="main">
+            <button id="startBtn">Start recording!</button>
+            <button id="stopBtn">Stop</button>
+          </div>
         </div>
       </div>
     </div>
+    <script src="preview-resizer.js" type="module"></script>
   </body>
 </html>
