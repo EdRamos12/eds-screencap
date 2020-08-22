@@ -1,6 +1,6 @@
 
 <h1 align="center">
-  <img src="https://github.com/EdRamos12/eds-screencap/blob/master/build/header-bg.png?raw=true" width="auto" alt="Golden Resource" />
+  <img src="https://github.com/EdRamos12/eds-screencap/blob/master/build/header.png?raw=true" width="auto" alt="Golden Resource" />
 </h1>
 
 <p align="center">Screen recorder made with Electron, based on <a href="https://github.com/fireship-io/223-electron-screen-recorder">Fireship's screen recorder project</a></p>
