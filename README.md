@@ -1,3 +1,4 @@
+
 <h1 align="center">
   <img src="https://github.com/EdRamos12/eds-screencap/blob/master/build/header-bg.png?raw=true" width="auto" alt="Golden Resource" />
 </h1>
@@ -19,20 +20,24 @@
  <a href="#-technologies">Technologies</a> — 
  <a href="#-features">Features</a> — 
  <a href="#-install-instructions">Install instructions</a> —  
- <a href="#-license">License</a> 
+ <a href="#-license">License</a> — 
+ <a href="#-contribution">Contribution</a>
 </p>
 
-# About
-Golden Resource is a screen recorder
+#  💻 About the project
 
-# 🛠 Technologies
+Golden Resource is a screen recorder made with studying purposes, to learn more about javascript, it's dependencies and about electronjs. The purpose of this application is a quick recorder you can pick to, and convert to a variable amount of video format, with a feature to backup any recording if the convertion fails.
+
+**🚧 Project currently not done. 🚧**
+
+## ⚙️ Technologies
 
 The following material was used to create this project:
 
 - [Node.js](https://nodejs.org/en/)
 - [Electron](https://www.electronjs.org/)
 
-# ☑️ Features
+## ☑️ Features
 
 Check the list for more details about the project.
 
@@ -41,11 +46,12 @@ Check the list for more details about the project.
 - [x] Responsive U.I
 - [x] Convert broken webm file
 - [x] Control system/microphone audio
+- [x] Resizable preview
 - [ ] U.I Revamp (again)
 
-# ❔ Install instructions
+## ❔ Running the project
 
-## Requirements
+### Requirements
 
 In case you want to run this project, you will need:
 - [Git](https://git-scm.com/) 
@@ -65,10 +71,10 @@ $ cd eds-screencap
 ### Installing dependencies
 
 ```bash
-# You can either use yarn
+# You can either use yarn...
 $ yarn
 
-# Or npm as package manager
+# ...or npm as package manager
 $ npm i
 ```
 
@@ -82,11 +88,11 @@ $ yarn start
 $ npm start
 ```
 
-# 📜 License
+## 📜 License
 
 This project is under the MIT license. See the [LICENSE](https://github.com/EdRamos12/eds-screencap/blob/master/LICENSE) for more information.
 
-# 🤝 Contributing
+## 🤝 Contribution
 
 This project is for study purposes, send me an email telling me what you are doing and teach me your knowledge!
 All kinds of contributions are very welcome and appreciated!
