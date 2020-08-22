@@ -3,7 +3,8 @@
   <img src="https://github.com/EdRamos12/eds-screencap/blob/master/build/header.png?raw=true" width="auto" alt="Golden Resource" />
 </h1>
 
-<p align="center">Screen recorder made with Electron, based on <a href="https://github.com/fireship-io/223-electron-screen-recorder">Fireship's screen recorder project</a></p>
+<p align="center">An open source Screen recorder made with Electron, based on <a href="https://github.com/fireship-io/223-electron-screen-recorder">Fireship's screen recorder project</a></p>
+
 
 <p align="center">
   <img alt="Github top language" src="https://img.shields.io/github/languages/top/edramos12/eds-screencap">
