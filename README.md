@@ -45,6 +45,7 @@ Check the list for more details about the project.
 - [x] Pause/Resume recording
 - [x] Responsive U.I
 - [x] Convert broken webm file
+- [x] Save to mulliple formats (MP4, WEBM, FLV and MOV)
 - [x] Control system/microphone audio
 - [x] Resizable preview
 - [ ] U.I Revamp (again)
