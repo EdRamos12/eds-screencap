@@ -15,12 +15,11 @@
 </p>
 
 <p align="center">
- <a href="#about">About</a> —
- <a href="#roadmap">Roadmap</a> • 
- <a href="#tecnologias">Tecnologias</a> • 
- <a href="#contribuicao">Contribuição</a> • 
- <a href="#licenc-a">Licença</a> • 
- <a href="#autor">Autor</a>
+ <a href="#about">About</a> — 
+ <a href="#-technologies">Technologies</a> — 
+ <a href="#-features">Features</a> — 
+ <a href="#-install-instructions">Install instructions</a> —  
+ <a href="#-license">License</a> 
 </p>
 
 # About
@@ -47,7 +46,8 @@ Check the list for more details about the project.
 # ❔ Install instructions
 
 ## Requirements
-To clone and run this project, you will need:
+
+In case you want to run this project, you will need:
 - [Git](https://git-scm.com/) 
 - [NodeJS](https://nodejs.org/en/) 
 - [Yarn](https://classic.yarnpkg.com/lang/en/)
