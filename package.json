@@ -55,7 +55,7 @@
     "ffmpeg-static": "^4.1.1",
     "fluent-ffmpeg": "^2.1.2",
     "node-notifier": "^7.0.0",
-    "systeminformation": "^4.23.5"
+    "systeminformation": "^4.30.5"
   },
   "devDependencies": {
     "@electron-forge/cli": "6.0.0-beta.50",
